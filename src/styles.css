@@ -1,0 +1,221 @@
+:root{
+  --bg:#000;
+  --fg:#00ff66;
+  --mono:"Fira Code", monospace;
+}
+
+*{box-sizing:border-box}
+html,body,#root{margin:0;height:100%;font-family:var(--mono);color:var(--fg);background:var(--bg)}
+
+.matrix-canvas{
+  position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block;
+}
+
+.app-root{min-height:100vh;position:relative;overflow:hidden}
+.center-wrap{
+  position:relative;z-index:2;
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;
+  padding:24px;
+}
+
+/* compact terminal window */
+.terminal-card{
+  width:min(600px,90vw);
+  height:min(400px,70vh);
+  background:rgba(0,0,0,0.85);
+  border-radius:8px;
+  border:1px solid rgba(0,255,110,0.25);
+  box-shadow:0 20px 60px rgba(0,255,110,0.15);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  padding:8px;
+}
+
+/* top bar */
+.term-top{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:rgba(0,0,0,0.4)}
+.term-dots{display:flex;gap:6px;align-items:center}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.dot.red{background:#ff5f56}.dot.yellow{background:#ffbd2e}.dot.green{background:#27c93f}
+.term-title{font-size:13px;color:rgba(0,255,110,0.95)}
+
+/* body */
+.term-body{padding:12px;flex:1;overflow:auto;font-size:14px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.term-body::-webkit-scrollbar{width:8px}
+.term-body::-webkit-scrollbar-thumb{background:rgba(0,255,110,0.12);border-radius:6px}
+
+/* input */
+.term-input{display:flex;align-items:center;gap:8px;margin-top:6px}
+.prompt{margin-right:8px;font-size:14px;opacity:0.92;color:var(--fg)}
+.cmd-input{flex:1;background:transparent;border:none;color:var(--fg);outline:none;font-family:var(--mono);font-size:14px;caret-color:transparent}
+
+/* blinking cursor */
+.blinking-cursor{width:8px;height:16px;background:var(--fg);display:inline-block;margin-left:2px;animation:blink 1s steps(2,end) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* responsive */
+@media(max-width:640px){
+  .terminal-card{width:90vw;height:60vh;padding:6px}
+  .term-body{font-size:13px}
+  .blinking-cursor{width:6px;height:14px}
+}
+/* DRAG & RESIZE */
+.terminal-card {
+  position: absolute; /* for drag */
+  cursor: default;
+}
+
+.term-top {
+  cursor: grab; /* drag on top bar */
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:6px 12px;
+  background:rgba(0,0,0,0.4);
+}
+
+.resizer {
+  width:12px;
+  height:12px;
+  background:rgba(0,255,110,0.4);
+  position:absolute;
+  right:2px;
+  bottom:2px;
+  cursor:se-resize;
+  border-radius:2px;
+}
+/* terminal card */
+.terminal-card {
+  position: absolute;
+  background: rgba(0,0,0,0.85);
+  border-radius: 6px;
+  border: 1px solid rgba(0,255,110,0.25);
+  box-shadow: 0 20px 40px rgba(0,255,110,0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 6px;
+  font-family: monospace;
+}
+
+/* top bar */
+.term-top {
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 10px;
+  background: rgba(0,0,0,0.4);
+}
+
+.term-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot.red { background: #ff5f56; }
+.dot.yellow { background: #ffbd2e; }
+.dot.green { background: #27c93f; }
+
+.term-title {
+  font-size: 13px;
+  color: rgba(0,255,110,0.95);
+}
+
+/* terminal body */
+.term-body {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #00ff66;
+}
+
+.term-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.term-body::-webkit-scrollbar-thumb {
+  background: rgba(0,255,110,0.12);
+  border-radius: 4px;
+}
+
+/* input line */
+.term-input {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.prompt {
+  margin-right: 6px;
+  color: #00ff66;
+  font-size: 14px;
+}
+
+.cmd-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #00ff66;
+  font-family: monospace;
+  font-size: 14px;
+  caret-color: transparent; /* hide default cursor */
+}
+
+.cmd-input::placeholder {
+  color: #00ff66; /* match text */
+  opacity: 0.6;
+}
+
+/* blinking cursor */
+.blinking-cursor {
+  width: 8px;
+  height: 16px;
+  background: #00ff66;
+  display: inline-block;
+  margin-left: 0px; /* cursor to left of text */
+  animation: blink 1s steps(2, start) infinite;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+@keyframes blink {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
+}
+
+/* resizer */
+.resizer {
+  width: 10px;
+  height: 10px;
+  background: rgba(0,255,110,0.4);
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  cursor: se-resize;
+  border-radius: 2px;
+}
+
+/* responsive small screens */
+@media(max-width:640px) {
+  .terminal-card {
+    width: 90vw;
+    height: 60vh;
+    padding: 5px;
+  }
+  .term-body { font-size: 13px; }
+  .blinking-cursor { width: 6px; height: 14px; }
+}

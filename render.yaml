@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: mo-portfolio
+    env: node
+    plan: free
+    region: frankfurt
+
+    buildCommand: npm run render-build
+    startCommand: npm start
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: OPENAI_API_KEY
+        sync: false # add manually in Render dashboard
+
+    autoDeploy: true
