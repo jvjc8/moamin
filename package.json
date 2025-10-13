@@ -1,4 +1,6 @@
 {
+  "packageManager": "npm@10.8.1",
+
   "name": "hacking-portfolio",
   "version": "1.0.0",
   "private": true,
