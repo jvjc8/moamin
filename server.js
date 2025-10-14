@@ -6,20 +6,126 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-const systemPrompt = `
-You are **Mohammed Amin’s AI Assistant**, living inside his personal portfolio.
-You have access to verified information about him:
+// 🧠 Mohammed Amin’s Personal Data
+const MOHAMMED_AMIN_DATA = {
+  about: [
+    "Hi — I'm Mohammed, a Full Stack Developer who builds reliable, scalable web applications.",
+    "I focus on React-driven frontends, Node.js/TypeScript backends, and pragmatic cloud deployments.",
+    "I enjoy turning product ideas into polished, production-ready code."
+  ],
 
-${JSON.stringify(MOHAMMED_AMIN_DATA, null, 2)}
+  skills: [
+    "Frontend: React, JavaScript, CSS, HTML",
+    "Backend: Node.js, Express, NestJS, GraphQL, REST APIs",
+    "Databases: MongoDB",
+    "DevOps & Cloud: Docker, GitHub Actions, Vercel",
+    "Tools: Git, Webpack, ESLint, Prettier, Jest, Cypress"
+  ],
 
-Your role:
-- Introduce yourself as Mohammed Amin’s AI.
-- If users ask about his background, projects, skills, or certificates — use the data above.
-- Provide links when available.
-- Speak naturally, confidently, and warmly.
-- Do not call yourself ChatGPT — you are Mohammed Amin’s assistant.
-- Keep answers short and clear unless the user asks for details.
-`;
+  projectsMeta: [
+    {
+      id: 1,
+      short: "Moviepub — Stream movies instantly",
+      details:
+        "A modern movie streaming platform built with React.js and Node.js, featuring dynamic UI, secure backend APIs, and seamless hosting on Netlify.",
+      thumb: "https://via.placeholder.com/50?text=1",
+      href: "https://moviepub.netlify.app/"
+    },
+    {
+      id: 2,
+      short: "Eclipse Auto Sales — Buy & sell cars online",
+      details:
+        "An interactive car marketplace built with React.js and Node.js, offering real-time listings, smooth user experience, and fully deployed on Netlify.",
+      thumb: "https://via.placeholder.com/50?text=2",
+      href: "https://eclipse-auto-sales.netlify.app/"
+    }
+  ],
+
+  certificates: [
+    {
+      name: "FullStack Development",
+      url: "https://simpli-web.app.link/e/Rjy11D7apXb",
+      image: "/images/fullstack.jpg"
+    },
+    {
+      name: "AWS Generative AI",
+      url: "https://simpli-web.app.link/e/GJjlpFdbpXb",
+      image: "/images/aws generative ai.jpg"
+    },
+    {
+      name: "Machine Learning Using Python",
+      url: "https://simpli-web.app.link/e/fE48NYkbpXb",
+      image: "/images/macine learning.jpg"
+    },
+    {
+      name: "Build Computer Vision App",
+      url: "https://coursera.org/share/3ff736a17304b3ec5936378498d97c33",
+      image: "/images/micro-python.jpg"
+    },
+    {
+      name: "Generative AI",
+      url: "https://coursera.org/share/3ff736a17304b3ec5936378498d97c33",
+      image: "/images/igeneai.jpg"
+    },
+    {
+      name: "Python Django 101",
+      url: "https://simpli-web.app.link/e/N7NN36SapXb",
+      image: "/images/pythondjango.jpg"
+    },
+    {
+      name: "Introduction to Cyber Security",
+      url: "https://simpli-web.app.link/e/V7q32IRapXb",
+      image: "/images/cybersecurity.jpg"
+    },
+    {
+      name: "Project Management 101",
+      url: "https://simpli-web.app.link/e/Ho6N3yPapXb",
+      image: "/images/project mana.jpg"
+    },
+    {
+      name: "SQL for Data Analysis",
+      url: "https://simpli-web.app.link/e/JBxOvNfVoXb",
+      image: "/images/sql data analysis.jpg"
+    },
+    {
+      name: "Python Programming",
+      url: "https://coursera.org/share/bbf3becb03a24da276de3fa317dfa584",
+      image: "/images/python.jpg"
+    },
+    {
+      name: "Software Engineering with Knowledge Graphs and RAG",
+      url: "https://simpli-web.app.link/e/kKOM2EiVoXb",
+      image: "/images/software engineering certificate.jpg"
+    },
+    {
+      name: "Software Engineering",
+      image: "/images/software  eng certeficate1.jpg"
+    }
+  ],
+
+  contact: [
+    {
+      label: "Email",
+      value: "mohammed@example.com",
+      href: "mailto:mohammed@example.com"
+    },
+    {
+      label: "GitHub",
+      value: "github.com/mohammed",
+      href: "https://github.com/jvjc8"
+    },
+    {
+      label: "LinkedIn",
+      value: "linkedin.com/in/mohammed",
+      href: "https://linkedin.com/in/mohammed"
+    },
+    {
+      label: "Portfolio",
+      value: "mohammed.dev",
+      href: "https://mohammed.dev"
+    }
+  ]
+};
 
 dotenv.config();
 
