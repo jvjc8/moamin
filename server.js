@@ -28,16 +28,16 @@ const MOHAMMED_AMIN_DATA = {
       short: "Moviepub — Stream movies instantly",
       details:
         "A modern movie streaming platform built with React.js and Node.js, featuring dynamic UI, secure backend APIs, and seamless hosting on Netlify.",
-      thumb: "https://via.placeholder.com/50?text=1",
-      href: "https://moviepub.netlify.app/"
+
+
     },
     {
       id: 2,
       short: "Eclipse Auto Sales — Buy & sell cars online",
       details:
         "An interactive car marketplace built with React.js and Node.js, offering real-time listings, smooth user experience, and fully deployed on Netlify.",
-      thumb: "https://via.placeholder.com/50?text=2",
-      href: "https://eclipse-auto-sales.netlify.app/"
+
+
     }
   ],
 

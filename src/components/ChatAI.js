@@ -11,9 +11,8 @@ export default function ChatAI() {
   const [sessionId, setSessionId] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
   const [typingText, setTypingText] = useState("");
-  const [toast, setToast] = useState(null); // 🌟 NEW TOAST STATE
+  const [toast, setToast] = useState(null);
 
-  // 🧩 Load or create unique session ID
   useEffect(() => {
     let id = localStorage.getItem("chat_session_id");
     if (!id) {
@@ -23,7 +22,6 @@ export default function ChatAI() {
     setSessionId(id);
   }, []);
 
-  // 🚀 Send message
   async function sendMessage(e) {
     if (e) e.preventDefault();
     if (!input.trim()) return;
@@ -38,23 +36,16 @@ export default function ChatAI() {
       const res = await fetch("http://localhost:5000/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: input,
-          sessionId,
-        }),
+        body: JSON.stringify({ message: input, sessionId }),
       });
 
       const data = await res.json();
       const aiText = data.reply;
 
-      // 💾 Check if AI learned something new (basic detection)
-      if (
-        /i['’]ll remember|i have saved|noted|got it, i['’]ll remember/i.test(aiText)
-      ) {
+      if (/i['’]ll remember|i have saved|noted|got it, i['’]ll remember/i.test(aiText)) {
         showToast("💾 Memory updated!");
       }
 
-      // ✨ Typing effect
       let i = 0;
       const typingInterval = setInterval(() => {
         if (i < aiText.length) {
@@ -63,10 +54,7 @@ export default function ChatAI() {
         } else {
           clearInterval(typingInterval);
           setIsTyping(false);
-          setMessages((prev) => [
-            ...prev,
-            { role: "assistant", content: aiText },
-          ]);
+          setMessages((prev) => [...prev, { role: "assistant", content: aiText }]);
           setTypingText("");
         }
       }, 20);
@@ -80,13 +68,11 @@ export default function ChatAI() {
     }
   }
 
-  // 🌟 Show glowing toast
   function showToast(text) {
     setToast(text);
     setTimeout(() => setToast(null), 2500);
   }
 
-  // ⌨️ Send on Enter
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -94,7 +80,6 @@ export default function ChatAI() {
     }
   };
 
-  // 💬 Show intro once
   useEffect(() => {
     if (open && firstOpen) {
       setMessages([
@@ -108,7 +93,6 @@ export default function ChatAI() {
     }
   }, [open, firstOpen]);
 
-  // 🌟 Tooltip intro
   useEffect(() => {
     if (!tooltipShownOnce) {
       setShowTooltip(true);
@@ -118,7 +102,6 @@ export default function ChatAI() {
     }
   }, [tooltipShownOnce]);
 
-  // 🧹 Reset chat + memory
   const resetChat = async () => {
     localStorage.removeItem("chat_session_id");
     setMessages([
@@ -133,7 +116,6 @@ export default function ChatAI() {
     setSessionId(newId);
   };
 
-  // 🗣️ Speak message aloud
   const speakText = (text) => {
     if (!window.speechSynthesis) {
       alert("Speech not supported in this browser.");
@@ -144,18 +126,18 @@ export default function ChatAI() {
     utterance.lang = isArabic ? "ar-SA" : "en-US";
     utterance.rate = 1;
     utterance.pitch = 1;
-    window.speechSynthesis.cancel(); // stop previous speech
+    window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
   };
 
   return (
     <>
-      {/* 💬 Floating toggle button */}
+      {/* 💬 Floating Button */}
       <div
         style={{
           position: "fixed",
-          bottom: "25px",
-          right: "25px",
+          bottom: "20px",
+          right: "20px",
           zIndex: 1000,
         }}
         onMouseEnter={() => setShowTooltip(true)}
@@ -168,13 +150,13 @@ export default function ChatAI() {
               right: "60px",
               bottom: "10px",
               background: "rgba(0,0,0,0.85)",
-              color: "#0af952ff",
+              color: "#00ff99",
               padding: "8px 10px",
               borderRadius: "8px",
               fontSize: "13px",
               fontFamily: "monospace",
-              border: "1px solid #047f29ff",
-              boxShadow: "0 0 10px #047f29ff",
+              border: "1px solid #00ff99",
+              boxShadow: "0 0 10px #00ff99",
               whiteSpace: "nowrap",
             }}
           >
@@ -206,10 +188,12 @@ export default function ChatAI() {
         <div
           style={{
             position: "fixed",
-            bottom: "85px",
-            right: "30px",
-            width: "320px",
-            height: "440px",
+            bottom: "80px",
+            right: "20px",
+            width: "90vw",
+            maxWidth: "360px",
+            height: "70vh",
+            maxHeight: "500px",
             background: "rgba(0,0,0,0.9)",
             color: "#00ff99",
             border: "1px solid #00ff99",
@@ -223,25 +207,27 @@ export default function ChatAI() {
             animation: "fadeIn 0.3s ease",
           }}
         >
-                <div
-          style={{
-            flexGrow: 1,
-            overflowY: "auto",
-            padding: "6px",
-            fontFamily: "monospace",
-            fontSize: "14px",
-            scrollbarWidth: "none", // Firefox
-            msOverflowStyle: "none", // IE & Edge
-          }}
-          id="chat-messages"
-        >
-                    <style>
+          {/* MESSAGES */}
+          <div
+            style={{
+              flexGrow: 1,
+              overflowY: "auto",
+              padding: "6px",
+              fontFamily: "monospace",
+              fontSize: "14px",
+              scrollbarWidth: "none",
+            }}
+            id="chat-messages"
+          >
+            <style>
               {`
-                #chat-messages::-webkit-scrollbar {
-                  display: none; /* Chrome, Safari, Opera */
+                #chat-messages::-webkit-scrollbar { display: none; }
+                @media (max-width: 600px) {
+                  #chat-messages { font-size: 13px; }
                 }
               `}
             </style>
+
             {messages.map((msg, i) => (
               <div
                 key={i}
@@ -269,6 +255,7 @@ export default function ChatAI() {
                 )}
               </div>
             ))}
+
             {isTyping && (
               <div style={{ textAlign: "left", margin: "6px 0" }}>
                 <b>AI:</b> {typingText}
@@ -277,6 +264,7 @@ export default function ChatAI() {
             )}
           </div>
 
+          {/* INPUT AREA */}
           <form
             onSubmit={sendMessage}
             style={{ display: "flex", flexDirection: "column", gap: "6px" }}
@@ -296,6 +284,7 @@ export default function ChatAI() {
                   borderRadius: "6px",
                   padding: "6px",
                   outline: "none",
+                  fontSize: "14px",
                 }}
               />
               <button
@@ -308,6 +297,7 @@ export default function ChatAI() {
                   padding: "6px 10px",
                   cursor: "pointer",
                   fontWeight: "bold",
+                  fontSize: "14px",
                 }}
               >
                 Send
@@ -335,7 +325,7 @@ export default function ChatAI() {
         </div>
       )}
 
-      {/* 🌟 Floating toast */}
+      {/* 🌟 Toast */}
       {toast && (
         <div
           style={{
@@ -358,7 +348,6 @@ export default function ChatAI() {
         </div>
       )}
 
-      {/* Animation + cursor blink */}
       <style>
         {`
           @keyframes fadeIn {
@@ -381,6 +370,16 @@ export default function ChatAI() {
           @keyframes blink {
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
+          }
+
+          /* ✅ MOBILE FIXES */
+          @media (max-width: 600px) {
+            .chat-panel {
+              width: 95vw !important;
+              height: 80vh !important;
+              right: 50%;
+              transform: translateX(50%);
+            }
           }
         `}
       </style>

@@ -12,8 +12,9 @@ import React, { useEffect, useRef, useState } from "react";
 
 export default function Terminal() {
   // Window & UI state
-  const initialWidth = 760;
-  const initialHeight = 520;
+const initialWidth = Math.min(window.innerWidth * 0.9, 760);
+const initialHeight = Math.min(window.innerHeight * 0.75, 520);
+
   const [pos, setPos] = useState({
     left: Math.max(8, window.innerWidth / 2 - initialWidth / 2),
     top: Math.max(8, window.innerHeight / 2 - initialHeight / 2)
@@ -24,11 +25,48 @@ export default function Terminal() {
   const dragOffset = useRef({ x: 0, y: 0 });
   const resizeStart = useRef({ x: 0, y: 0, w: initialWidth, h: initialHeight });
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+
+
+useEffect(() => {
+  let resizeTimeout;
+
+  const handleResize = () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+
+      const visibleHeight = window.visualViewport?.height || window.innerHeight;
+      const visibleWidth = window.visualViewport?.width || window.innerWidth;
+
+      if (mobile) {
+        setPos({ left: 0, top: 0 });
+        setSize({ width: visibleWidth, height: visibleHeight });
+      } else {
+        const newWidth = Math.min(window.innerWidth * 0.9, 760);
+        const newHeight = Math.min(window.innerHeight * 0.75, 520);
+        setPos({
+          left: Math.max(8, window.innerWidth / 2 - newWidth / 2),
+          top: Math.max(8, window.innerHeight / 2 - newHeight / 2)
+        });
+        setSize({ width: newWidth, height: newHeight });
+      }
+    }, 150);
+  };
+
+  handleResize();
+  window.addEventListener("resize", handleResize);
+  window.visualViewport?.addEventListener("resize", handleResize);
+
+  return () => {
+    clearTimeout(resizeTimeout);
+    window.removeEventListener("resize", handleResize);
+    window.visualViewport?.removeEventListener("resize", handleResize);
+  };
+}, []);
+
+
+
   // Theme color definitions
   const themeDefinitions = {
     green: {
@@ -245,10 +283,11 @@ export default function Terminal() {
 ],
 
     contact: [
-      { label: "Email", value: "mohammed@example.com", href: "mailto:mohammed@example.com" },
+      { label: "Email", value: "mohammed@example.com", href: "moaminabush@gmail.com" },
       { label: "GitHub", value: "github.com/mohammed", href: "https://github.com/jvjc8" },
-      { label: "LinkedIn", value: "linkedin.com/in/mohammed", href: "https://linkedin.com/in/mohammed" },
-      { label: "Portfolio", value: "mohammed.dev", href: "https://mohammed.dev" }
+      { label: "LinkedIn", value: "linkedin.com/in/mohammed", href: "https://www.linkedin.com/in/mohammedamin-a-1972b9378?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" },
+      { label: "Reddit", value: "github.com/mohammed", href: "https://www.reddit.com/user/abushM9/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button" },
+      { label: "Twitter", value: "github.com/mohammed", href: "https://x.com/Abush1778" },
     ]
   };
 
@@ -780,6 +819,7 @@ export default function Terminal() {
       if (gameLoopRef.current) clearInterval(gameLoopRef.current);
     };
   }, []);
+   
 
   // drag / resize handlers
   function startDrag(e) {
@@ -788,6 +828,8 @@ export default function Terminal() {
     dragOffset.current = { x: e.clientX - pos.left, y: e.clientY - pos.top };
     document.body.style.userSelect = "none";
   }
+
+
   function startResize(e) {
     e.stopPropagation();
     setIsResizing(true);
@@ -1004,6 +1046,40 @@ export default function Terminal() {
           .term-body { -ms-overflow-style: none; scrollbar-width: none; }
           .term-line a { color: inherit; text-decoration: underline; cursor: pointer; }
         `}</style>
+        <style>{`
+  @media (max-width: 768px) {
+    .term-body {
+      font-size: 0.9rem !important;
+      padding: 10px !important;
+    }
+
+    .terminal-window {
+      width: 100vw !important;
+      height: 100vh !important;
+      left: 0 !important;
+      top: 0 !important;
+      border-radius: 0 !important;
+    }
+      .terminal-window {
+  position: fixed;
+  inset: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+  overflow: hidden;
+  z-index: 10;
+}
+
+
+    .project-gallery img {
+      width: 48px !important;
+      height: 48px !important;
+    }
+
+    input {
+      font-size: 0.9rem !important;
+    }
+  }
+`}</style>
 
         {/* Top bar (drag handle) */}
         <div
