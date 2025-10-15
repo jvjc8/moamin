@@ -1,19 +1,12 @@
-import express from "express";
-import cors from "cors";
 import OpenAI from "openai";
-import dotenv from "dotenv";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 
 // 🧠 Mohammed Amin’s Personal Data
 const MOHAMMED_AMIN_DATA = {
   about: [
-    "Hi — I'm Mohammed, a Full Stack Developer who builds reliable, scalable web applications.",
+    "Hi — I'm Mohammedamin, a Full Stack Developer who builds reliable, scalable web applications.",
     "I focus on React-driven frontends, Node.js/TypeScript backends, and pragmatic cloud deployments.",
     "I enjoy turning product ideas into polished, production-ready code."
   ],
-
   skills: [
     "Frontend: React, JavaScript, CSS, HTML",
     "Backend: Node.js, Express, NestJS, GraphQL, REST APIs",
@@ -21,26 +14,20 @@ const MOHAMMED_AMIN_DATA = {
     "DevOps & Cloud: Docker, GitHub Actions, Vercel",
     "Tools: Git, Webpack, ESLint, Prettier, Jest, Cypress"
   ],
-
   projectsMeta: [
     {
       id: 1,
       short: "Moviepub — Stream movies instantly",
       details:
-        "A modern movie streaming platform built with React.js and Node.js, featuring dynamic UI, secure backend APIs, and seamless hosting on Netlify.",
-
-
+        "A modern movie streaming platform built with React.js and Node.js, featuring dynamic UI, secure backend APIs, and seamless hosting on Netlify."
     },
     {
       id: 2,
       short: "Eclipse Auto Sales — Buy & sell cars online",
       details:
-        "An interactive car marketplace built with React.js and Node.js, offering real-time listings, smooth user experience, and fully deployed on Netlify.",
-
-
+        "An interactive car marketplace built with React.js and Node.js, offering real-time listings, smooth user experience, and fully deployed on Netlify."
     }
   ],
-
   certificates: [
     {
       name: "FullStack Development",
@@ -102,7 +89,6 @@ const MOHAMMED_AMIN_DATA = {
       image: "/images/software  eng certeficate1.jpg"
     }
   ],
-
   contact: [
     {
       label: "Email",
@@ -127,60 +113,33 @@ const MOHAMMED_AMIN_DATA = {
   ]
 };
 
-dotenv.config();
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-// ✅ OpenAI client
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-// 🧠 Memory file setup
-const MEMORY_FILE = "./memory.json";
-
-// Load memory
-function loadMemory() {
-  try {
-    if (fs.existsSync(MEMORY_FILE)) {
-      const data = fs.readFileSync(MEMORY_FILE, "utf-8");
-      return JSON.parse(data);
-    }
-  } catch (err) {
-    console.error("⚠️ Error loading memory file:", err);
-  }
-  return {};
-}
-
-// Save memory
-function saveMemory(data) {
-  try {
-    fs.writeFileSync(MEMORY_FILE, JSON.stringify(data, null, 2));
-  } catch (err) {
-    console.error("⚠️ Error saving memory file:", err);
-  }
-}
-
-let sessions = loadMemory();
+// 🧠 Temporary in-memory sessions (serverless-safe)
+let sessions = {};
 
 function getSession(sessionId) {
   if (!sessions[sessionId]) {
     sessions[sessionId] = {
       name: null,
       interests: [],
-      history: [],
+      history: []
     };
   }
   return sessions[sessionId];
 }
 
-// 🧩 AI Chat Route
-app.post("/api/chat", async (req, res) => {
+// ✅ Vercel API handler
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Only POST allowed" });
+  }
+
   try {
     const { message, sessionId } = req.body;
-    console.log(`📩 [${sessionId}] ${message}`);
+    if (!message || !sessionId) {
+      return res.status(400).json({ error: "Missing message or sessionId" });
+    }
+
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const session = getSession(sessionId);
     const userHistory = session.history.slice(-10);
@@ -199,11 +158,10 @@ Your role:
 - Talk confidently about Mohammed Amin’s skills, projects, and certificates.
 - If a user asks for project links or contact info, use the data above.
 - You can mention his GitHub and LinkedIn.
-- Remember facts users share (like their name or interests).
+- Remember facts users share (like their name or interests) for the current session.
 - Never call yourself ChatGPT — you are Mohammed Amin’s AI assistant.
 - Always speak naturally and conversationally.
 `;
-
 
     const messages = [
       { role: "system", content: systemPrompt },
@@ -211,22 +169,21 @@ Your role:
         role: "system",
         content: `User memory: ${JSON.stringify({
           name: session.name,
-          interests: session.interests,
-        })}`,
+          interests: session.interests
+        })}`
       },
       ...userHistory,
-      { role: "user", content: message },
+      { role: "user", content: message }
     ];
 
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
-      messages,
+      messages
     });
 
     const reply = completion.choices[0].message.content;
-    console.log(`🤖 [${sessionId}] ${reply}`);
 
-    // Save conversation
+    // 🧠 Save conversation
     session.history.push({ role: "user", content: message });
     session.history.push({ role: "assistant", content: reply });
 
@@ -237,7 +194,6 @@ Your role:
       if (session.name !== newName) {
         session.name = newName;
         memoryUpdated = true;
-        console.log(`💾 Remembered new name: ${newName}`);
       }
     }
 
@@ -250,28 +206,12 @@ Your role:
       if (!session.interests.includes(interest)) {
         session.interests.push(interest);
         memoryUpdated = true;
-        console.log(`💾 Added new interest: ${interest}`);
       }
     }
 
-    if (memoryUpdated) saveMemory(sessions);
-
-    res.json({ reply, memoryUpdated });
+    res.status(200).json({ reply, memoryUpdated });
   } catch (error) {
-    console.error("❌ Chat error:", error);
+    console.error("❌ API error:", error);
     res.status(500).json({ error: error.message });
   }
-});
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const buildPath = path.join(__dirname, "build");
-
-app.use(express.static(buildPath));
-
-// ✅ React Router fallback for all unmatched routes
-app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(buildPath, "index.html"));
-});
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
+}
